@@ -37,7 +37,7 @@ Description=%s
 
 [Service]
 Type=forking
-ExecStart=systemd-rununit %s %s
+ExecStart=eru-systemd-rununit %s %s
 
 [Install]
 WantedBy=multi-user.target

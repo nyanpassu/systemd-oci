@@ -16,10 +16,11 @@ type Unit interface {
 }
 
 // NewUnit .
-func NewUnit(id string, unitName string) Unit {
+func NewUnit(id string, unitName string, fileManager FileManager) Unit {
 	return &unit{
-		id:       id,
-		unitName: unitName,
+		id:          id,
+		unitName:    unitName,
+		fileManager: fileManager,
 	}
 }
 
@@ -62,7 +63,7 @@ func (u *unit) Delete() error {
 	if err := systemctl.Disable(u.unitName); err != nil {
 		return err
 	}
-	return u.fileManager.RemoveSystemdUnitFile(u.id)
+	return u.fileManager.RemoveSystemdUnitFile(u.unitName)
 }
 
 func (u *unit) getPid() (int, bool, error) {

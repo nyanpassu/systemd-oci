@@ -9,8 +9,8 @@ type UnitManager interface {
 }
 
 // NewUnitManager .
-func NewUnitManager() (UnitManager, error) {
-	return &unitManager{}, nil
+func NewUnitManager(fileManager FileManager) (UnitManager, error) {
+	return &unitManager{fileManager: fileManager}, nil
 }
 
 type unitManager struct {
@@ -26,7 +26,7 @@ func (m *unitManager) GetUnit(id string) (Unit, bool, error) {
 	if !exists {
 		return nil, false, nil
 	}
-	return NewUnit(id, unitName), true, nil
+	return NewUnit(id, unitName, m.fileManager), true, nil
 }
 
 func (m *unitManager) Create(unit UnitFile) error {

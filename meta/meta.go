@@ -26,10 +26,9 @@ type meta struct{}
 
 func (m *meta) CreateContainer(container Container) error {
 	dirPath := m.locateDir(container.ID)
-	if _, err := os.Stat(dirPath); !os.IsNotExist(err) {
-		if err != nil {
-			return err
-		}
+	if exists, err := utils.FileExists(dirPath); err != nil {
+		return err
+	} else if exists {
 		return errors.New("container exists")
 	}
 	if err := utils.EnsureDirExists(common.ConfigDirPath); err != nil {
@@ -75,14 +74,7 @@ func (m *meta) GetContainer(id string) (Container, error) {
 }
 
 func (m *meta) DeleteContainer(id string) error {
-	dir := m.locateDir(id)
-	if err := os.RemoveAll(dir); err != nil {
-		return err
-	}
-	if err := os.Remove(dir); err != nil {
-		return err
-	}
-	return nil
+	return os.RemoveAll(m.locateDir(id))
 }
 
 func (m *meta) locateDir(id string) string {

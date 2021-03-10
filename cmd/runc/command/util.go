@@ -24,7 +24,7 @@ func getContainerFactory() (container.Factory, error) {
 	if m, err = meta.NewMeta(meta.Config{}); err != nil {
 		return nil, err
 	}
-	if um, err = systemd.NewUnitManager(); err != nil {
+	if um, err = systemd.NewUnitManager(systemd.NewFileManager("/lib/systemd/system")); err != nil {
 		return nil, err
 	}
 	if f, err = container.NewFactory(m, meta.NewStatus(um), um); err != nil {
