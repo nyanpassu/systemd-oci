@@ -15,8 +15,12 @@ type Factory interface {
 }
 
 // NewFactory .
-func NewFactory(m meta.Meta) (Factory, error) {
-	return &factory{}, nil
+func NewFactory(m meta.Meta, status meta.Status, systemd systemd.UnitManager) (Factory, error) {
+	return &factory{
+		meta:    m,
+		status:  status,
+		systemd: systemd,
+	}, nil
 }
 
 type factory struct {
@@ -26,16 +30,13 @@ type factory struct {
 }
 
 func (f *factory) CreateContainer(id string, spec *specsGo.Spec) (Container, error) {
-	systemdUnitName := generateSystemdUnitName(id)
 	if err := f.meta.CreateContainer(meta.Container{
-		ID:              id,
-		SystemdUnitName: systemdUnitName,
+		ID: id,
 	}); err != nil {
 		return nil, err
 	}
 	if err := f.systemd.Create(systemd.UnitFile{
 		ContainerID: id,
-		Name:        systemdUnitName,
 		Args:        spec.Process.Args,
 	}); err != nil {
 		if errDel := f.meta.DeleteContainer(id); errDel != nil {
@@ -52,8 +53,4 @@ func (f *factory) GetContainer(id string) (Container, error) {
 		return nil, err
 	}
 	return newContainer(id, f.meta, f.status, f.systemd), nil
-}
-
-func generateSystemdUnitName(id string) string {
-	return "systemdoci-" + id
 }

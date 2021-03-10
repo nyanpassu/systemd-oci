@@ -3,9 +3,17 @@ package systemd
 // UnitFile .
 type UnitFile struct {
 	ContainerID string
-	Name        string
 	Args        []string
 }
 
-// Status .
-type Status int
+// UnitStatus .
+type UnitStatus int
+
+const (
+	// StatusCreated .
+	StatusCreated UnitStatus = 1 << iota
+	// StatusRunning .
+	StatusRunning
+	// StatusError .
+	StatusError
+)

@@ -2,9 +2,12 @@ package meta
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 
 	"github.com/juju/errors"
+	"github.com/nyanpassu/systemd-oci/common"
+	"github.com/nyanpassu/systemd-oci/utils"
 )
 
 // Meta .
@@ -19,8 +22,7 @@ func NewMeta(config Config) (Meta, error) {
 	return &meta{}, nil
 }
 
-type meta struct {
-}
+type meta struct{}
 
 func (m *meta) CreateContainer(container Container) error {
 	dirPath := m.locateDir(container.ID)
@@ -29,6 +31,9 @@ func (m *meta) CreateContainer(container Container) error {
 			return err
 		}
 		return errors.New("container exists")
+	}
+	if err := utils.EnsureDirExists(common.ConfigDirPath); err != nil {
+		return err
 	}
 	if err := os.Mkdir(dirPath, 0644); err != nil {
 		return err
@@ -55,9 +60,9 @@ func (m *meta) CreateContainer(container Container) error {
 
 func (m *meta) GetContainer(id string) (Container, error) {
 	var (
-		c Container
+		c       Container
 		content []byte
-		err error
+		err     error
 	)
 	filePath := m.locateFile(id)
 	if content, err = os.ReadFile(filePath); err != nil {
@@ -70,20 +75,20 @@ func (m *meta) GetContainer(id string) (Container, error) {
 }
 
 func (m *meta) DeleteContainer(id string) error {
-	if err := os.RemoveAll(m.locateDir(id)); err != nil {
+	dir := m.locateDir(id)
+	if err := os.RemoveAll(dir); err != nil {
 		return err
 	}
-	if 
+	if err := os.Remove(dir); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (m *meta) locateDir(id string) string {
-	return "/var/run/systemd-runc/" + id
+	return fmt.Sprintf("%s/%s", common.ConfigDirPath, id)
 }
 
 func (m *meta) locateFile(id string) string {
-	return "/var/run/systemd-runc/" + id + "/container.json"
-}
-
-func (m *meta) write(container Container) string {
-
+	return fmt.Sprintf("%s/%s/container.json", common.ConfigDirPath, id)
 }

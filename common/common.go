@@ -29,4 +29,6 @@ your host. Providing the bundle directory using "-b" is optional. The default
 value for "bundle" is the current directory.`
 	// OCIVersion .
 	OCIVersion = "1.0.2-dev"
+	// ConfigFilePath .
+	ConfigDirPath = "/var/run/systemd-runc"
 )

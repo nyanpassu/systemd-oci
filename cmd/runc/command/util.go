@@ -11,18 +11,23 @@ import (
 	"github.com/nyanpassu/systemd-oci/container"
 	"github.com/nyanpassu/systemd-oci/meta"
 	"github.com/nyanpassu/systemd-oci/spec"
+	"github.com/nyanpassu/systemd-oci/systemd"
 )
 
 func getContainerFactory() (container.Factory, error) {
 	var (
 		err error
 		m   meta.Meta
+		um  systemd.UnitManager
 		f   container.Factory
 	)
 	if m, err = meta.NewMeta(meta.Config{}); err != nil {
 		return nil, err
 	}
-	if f, err = container.NewFactory(m); err != nil {
+	if um, err = systemd.NewUnitManager(); err != nil {
+		return nil, err
+	}
+	if f, err = container.NewFactory(m, meta.NewStatus(um), um); err != nil {
 		return nil, err
 	}
 	return f, nil
