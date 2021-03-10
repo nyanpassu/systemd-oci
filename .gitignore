@@ -1,0 +1,16 @@
+.vscode
+target
+dist
+cert/
+vendor/*
+.mypy_cache
+**/__pycache__
+**/.DS_Store
+/install
+scripts/conf
+scripts/*.gz
+logs
+*.log
+
+systemd-runc
+systemd-rununit
